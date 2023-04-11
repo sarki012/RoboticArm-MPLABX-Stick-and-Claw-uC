@@ -1,5 +1,5 @@
 /*
- * File:   servo_init.c
+ * File:   init.c for UC2
  * Author: Erik Sarkinen
  *
  * Created on February 12, 2022, 8:26 AM
@@ -10,6 +10,7 @@
 #include <p33ep512mc502.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 void init(void)
 { 
@@ -108,7 +109,7 @@ void init(void)
     TRISBbits.TRISB13 = 0;      //PWM2L is an output
     TRISBbits.TRISB12 = 0;      //PWM2H is an output
     TRISBbits.TRISB11 = 0;      //PWM3L is an output
-    TRISBbits.TRISB10 = 0;      //PWM3H is an output
+    TRISBbits.TRISB10 = 0;      //PWM3H is an output different types of outputs?
     PORTBbits.RB15 = 0;         //Clear the output pin
     PORTBbits.RB14 = 0;         //Clear the output pin
     PORTBbits.RB13 = 0;         //Clear the output pin
@@ -197,7 +198,10 @@ void init(void)
     FCLCON1bits.FLTMOD = 3;
     FCLCON2bits.FLTMOD = 3;
     PTCONbits.PTEN = 1;         //PWM Module is enabled
+    
 
+     
 
+    
     return;
 }

@@ -1,8 +1,9 @@
 /*
+/*
  * File:   stickThread.c
  * Author: Erik Sarkinen
  *
- * Created on April 29, 2022, 4:43 PM
+ * Created on February 21st, 2023, 2:18 PM
  */
 #include <xc.h>
 #include <p33ep512mc502.h>
@@ -16,34 +17,34 @@ volatile extern char usbRxval[20];     //The UART receive array which holds the 
 void stickThread( void *pvParameters )
 {
     int  i = 0;
-    int numDelayLoops = 1000;
+    int numDelayLoops = 500;
  
     PHASE1 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
-    PDC1 = 2500;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
+    PDC1 = 3400;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
     while(1)
     {
         for(i = 0; i < 20; i++)
         {
-            if(usbRxval[i] == '*')
+            if(usbRxval[i] == '&')
             {
                 break;
             }
-            else if(usbRxval[i] == 'o')
+            else if(usbRxval[i] == 'O')
             {
                 PDC1--;         //Decrementing the duty cycle moves the stick out
                 delay(numDelayLoops);
-                if(PDC1 < 1658)
+                if(PDC1 < 1700)
                 {
-                    PDC1 = 1658;        //We don't let PDC2 get less than 1658
+                    PDC1 = 1700;        //We don't let PDC2 get less than 1658
                 }
             }
-            else if(usbRxval[i] == 'i')
+            else if(usbRxval[i] == 'I')
             {
                 PDC1++;         //Incrementing the duty cycle moves the stick in
                 delay(numDelayLoops);
-                if(PDC1 > 3870)
+                if(PDC1 > 3500)
                 {
-                    PDC1 = 3870;        //We don't let PDC2 get greater than 3870
+                    PDC1 = 3500;        //We don't let PDC2 get greater than 3870
                 } 
             }        
         }

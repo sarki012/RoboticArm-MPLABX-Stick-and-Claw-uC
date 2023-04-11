@@ -49,11 +49,14 @@
 #include "FreeRTOSConfig.h"
 #include "main.h"
 
+
 volatile char usbRxval[20];     //The UART receive array which holds the data sent 
                                 //via USB from the Raspberry Pi
-volatile char rxval[20];     //The UART receive array which holds the data sent 
-                             //via Bluetooth from the tablet
+volatile char rxval[20];    
 int x = 0, y = 0;
+unsigned int stickADC = 0, tipADC = 0, clawADC = 0;
+
+//Raspberry Pi USB to UART receive interrupt
 void __attribute__((__interrupt__, auto_psv)) _U1RXInterrupt(void)             
 {
     IFS0bits.U1RXIF = 0;        //Clear the interrupt flag
@@ -65,7 +68,7 @@ void __attribute__((__interrupt__, auto_psv)) _U1RXInterrupt(void)
     }
     return;
  }
-//UART 2 receive interrupt, receiving characters from stick and claw microcontroller
+
 void __attribute__((__interrupt__, auto_psv)) _U2RXInterrupt(void)             
 {
     IFS1bits.U2RXIF = 0;        //Clear the interrupt flag
@@ -79,6 +82,17 @@ void __attribute__((__interrupt__, auto_psv)) _U2RXInterrupt(void)
  }
 void __attribute__((__interrupt__, auto_psv)) _DefaultInterrupt(void)
 {
+    if(IFS0bits.AD1IF)
+    {
+        IFS0bits.AD1IF = 0;
+        stickADC = ADC1BUF0;
+        tipADC = ADC1BUF1;
+        clawADC = ADC1BUF2;
+     
+       return;
+    }
+    else
+         return;
     return;
 }
 
@@ -91,9 +105,12 @@ void main(void) {
     }
     init();     //Setup clock, UART, and PWMs
     
+    //DMA0STAL = __builtin_dmaoffset(stickBuffer); //DMA0 start address low byte 
     xTaskCreate( stickThread, "Stick", 512, NULL, 1, NULL );    //Thread that controls the stick
-//	xTaskCreate( tipThread, "Tip", 512, NULL, 1, NULL );      //Thread that controls the tip motion
-
+	xTaskCreate( tipThread, "Tip", 512, NULL, 1, NULL );      //Thread that controls the tip motion
+    xTaskCreate( clawThread, "Claw", 512, NULL, 1, NULL );      //Thread that controls the tip motion
+    xTaskCreate( feedbackThread, "Feedback", 512, NULL, 1, NULL );      //Thread that sends the feedback values
+    
 	//Start the scheduler
 	vTaskStartScheduler();
 

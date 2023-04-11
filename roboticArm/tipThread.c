@@ -11,69 +11,41 @@
 #include "FreeRTOSConfig.h"
 #include "main.h"
 
-volatile extern char rxval[20];     //The UART receive array which holds the data sent 
+volatile extern char usbRxval[20];     //The UART receive array which holds the data sent 
                                     //via Bluetooth from the tablet
 void tipThread( void *pvParameters )
 {
     int  i = 0;
-    int curl = 0;
-    int delayPercentage = 0;
-    int numDelayLoops = 0;
-    int delayReceived = 0;
-    PHASE3 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
-    PDC3 = 1500;            //Duty cycle register. Starting duty cycle is 1500.
+    int numDelayLoops = 500;
+ 
+    PHASE2 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
+    PDC2 = 3000;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
     while(1)
     {
-        for(i = 0; i < 45; i++)
+        for(i = 0; i < 20; i++)
         {
-            //This means the next character is a +/- followed by three characters
-            //which are passed to charToInt which returns an integer value
-            //delayPercentage is a number between 0-100 that will speed up or slow down the boom
-            if(rxval[i] == 'd')
+            if(usbRxval[i] == '^')
             {
-                delayPercentage = charToInt(rxval[i+1], rxval[i+2], rxval[i+3], rxval[i+4]);
-                numDelayLoops = delayPercentage;        //Number of delay loops passed to delay() function after each motor update
-                delayReceived = 1;      //This means next time we get a 'c' we break from the loop
+                break;
             }
-            else if(rxval[i] == 'c')
+            else if(usbRxval[i] == 't')
             {
-                //This means the next character is a +/- followed by three characters
-                //which are passed to charToInt which returns an integer value
-                //curl holds the pixels in the x-direction from the bottom right joystick
-                curl = charToInt(rxval[i+1], rxval[i+2], rxval[i+3], rxval[i+4]);
-                if(delayReceived)
+                PDC2--;         //Decrementing the duty cycle moves the stick out
+                delay(numDelayLoops);
+                if(PDC2 < 1658)
                 {
-                     //We've received stick data and delay data. Break from loop
-                    delayReceived = 0;
-                    break;
+                    PDC2 = 1658;        //We don't let PDC2 get less than 1658
                 }
-             }
-        }
-        //Motor Arithmitic Here
-        //PHASE3 and PDC3 are for the bucket curl motor
-        //With Max Resolution:
-        //PHASEx = 36,850
-        //Max Duty Cycle is PDC = 4,054
-        //Neutral Duty Cycle is PDC = 3,685;
-        //Min Duty Cycle is PDC = 1,474
-        if(curl > 200)      //We don't touch the motors if the thumb press is in the circle
-        {
-            PDC3++;         //Incrementing the duty cycle rolls the bucket out
-            delay(numDelayLoops);
-            if(PDC3 > 4054)
-            {
-                PDC3 = 4054;        //We don't let PDC1 get greater than 4054
             }
-
-        }
-        else if(curl < -200)
-        {
-            PDC3--;         //Decrementing the duty cycle curls the bucket
-            delay(numDelayLoops);
-            if(PDC3 < 1474)
+            else if(usbRxval[i] == 'p')
             {
-                PDC3 = 1474;        //We don't let PDC3 get less than 1,474
-            }
+                PDC2++;         //Incrementing the duty cycle moves the stick in
+                delay(numDelayLoops);
+                if(PDC2 > 3870)
+                {
+                    PDC2 = 3870;        //We don't let PDC2 get greater than 3870
+                } 
+            }        
         }
-    } 
+    }
 }

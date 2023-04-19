@@ -15,15 +15,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Define Message Buffer Length for ECAN1/ECAN2
-#define  MAX_CHNUM	 			3		// Highest Analog input number in Channel Scan
-#define  SAMP_BUFF_SIZE	 		8		// Size of the input buffer per analog input
-#define  NUM_CHS2SCAN			3		// Number of channels enabled for channel scan
+
 
 // Number of locations for ADC buffer = 14 (AN0 to AN13) x 8 = 112 words
 // Align the buffer to 128 words or 256 bytes. This is needed for peripheral indirect mode
-int  BufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((space(dma),aligned(256)));
-int  BufferB[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((space(dma),aligned(256)));
+//int  BufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((space(dma),aligned(256)));
+//int  BufferB[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((space(dma),aligned(256)));
+
+//Create DMA buffer for ADC, the macro is required because the buffer is
+//outside of the normal memory space
+__eds__ unsigned int BufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
+__eds__ unsigned int BufferB[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
 
 void ProcessADCSamples(int * AdcBuffer);
 
@@ -39,7 +41,8 @@ void initAdc1(void)
     
     AD1CON1bits.ADON = 0;   //ADC is disabled before changing registers
     AD1CON1bits.ADSIDL = 0;  //Continue operation in idle mode
-	AD1CON1bits.FORM   = 2;		// Data Output Format: Fractional
+    AD1CON1bits.FORM   = 0;		// Data Output Format: Unsigned Integer
+	//AD1CON1bits.FORM   = 2;		// Data Output Format: Fractional
     AD1CON1bits.SSRCG = 0;
 	AD1CON1bits.SSRC   = 2;		// Sample Clock Source: GP Timer starts conversion
 	AD1CON1bits.ASAM   = 1;		// ADC Sample Control: Sampling begins immediately after conversion
@@ -68,19 +71,21 @@ void initAdc1(void)
 	IFS0bits.AD1IF   = 0;		// Clear the A/D interrupt flag bit
 	IEC0bits.AD1IE   = 0;		// Do Not Enable A/D interrupt 
 	AD1CON1bits.ADON = 1;		// Turn on the A/D converter
+    return;
 }
 
 /*=============================================================================  
 Timer 3 is setup to time-out every 125 microseconds (8Khz Rate). As a result, the module 
 will stop sampling and trigger a conversion on every Timer3 time-out, i.e., Ts=125us. 
 =============================================================================*/
-void initTmr3() 
+void initTmr3(void) 
 {
 	TMR3 = 0x0000;
 	PR3  = 4999;			// Trigger ADC1 every 125usec
 	IFS0bits.T3IF = 0;		// Clear Timer 3 interrupt
 	IEC0bits.T3IE = 0;		// Disable Timer 3 interrupt
 	T3CONbits.TON = 1;		//Start Timer 3
+    return;
 }
 
 
@@ -94,14 +99,20 @@ void initDma0(void)
 {
 	DMA0CONbits.AMODE = 2;			// Configure DMA for Peripheral indirect mode
 	DMA0CONbits.MODE  = 2;			// Configure DMA for Continuous Ping-Pong mode
+ //   DMA0CONbits.DIR = 0;        // Reads from peripheral address, writes to RAM address
 	DMA0PAD=(int)&ADC1BUF0;
 	DMA0CNT = (SAMP_BUFF_SIZE*NUM_CHS2SCAN)-1;					
 	DMA0REQ = 13;					// Select ADC1 as DMA Request source
 
-	DMA0STAH = 0x0000;
-    DMA0STAL = 0x0000;
+	//DMA0STAH = 0x0000;
+    //DMA0STAL = 0x0000;
+	//DMA0STBH = 0x0000;
+    //DMA0STBL = 0x0000;
+    
+    DMA0STAH = 0x0000;
+    DMA0STAL = __builtin_dmaoffset(BufferA);		
 	DMA0STBH = 0x0000;
-    DMA0STBL = 0x0000;
+    DMA0STBL = __builtin_dmaoffset(BufferB);
     
     //DMA0STB = __builtin_dmaoffset(BufferB);     //along with a DMA0STBH and DMA0STBL
 
@@ -109,9 +120,33 @@ void initDma0(void)
     IEC0bits.DMA0IE = 1;			//Set the DMA interrupt enable bit
 
 	DMA0CONbits.CHEN=1;				// Enable DMA
-
+    return;
 }
+/*=============================================================================
+_DMA0Interrupt(): ISR name is chosen from the device linker script.
+=============================================================================*/
 
+unsigned int DmaBuffer = 0;
+void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void)
+{
+	if(DmaBuffer == 0)
+	{
+       // sendChar('s');
+        
+       // sendChar((BufferA[0][0] >> 8) & 0x00FF);      //High byte
+        //sendChar(BufferA[0][0] & 0x00FF);      //Low byte
+	}
+	else
+	{
+	//	ProcessADCSamples(&BufferB[4][0]);
+	//	ProcessADCSamples(&BufferB[5][0]);
+	//	ProcessADCSamples(&BufferB[10][0]);
+	//	ProcessADCSamples(&BufferB[13][0]);
+	}
+
+	DmaBuffer ^= 1;	
+	IFS0bits.DMA0IF = 0;		// Clear the DMA0 Interrupt Flag
+}
 /*
 #define ADC_BUFF_LEN 8 //Length of the DMA Buffer, should be a power of 2
 

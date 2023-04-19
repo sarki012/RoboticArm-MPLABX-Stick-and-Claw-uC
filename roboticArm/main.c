@@ -54,7 +54,7 @@ volatile char usbRxval[20];     //The UART receive array which holds the data se
                                 //via USB from the Raspberry Pi
 volatile char rxval[20];    
 int x = 0, y = 0;
-unsigned int stickADC = 0, tipADC = 0, clawADC = 0;
+
 
 //Raspberry Pi USB to UART receive interrupt
 void __attribute__((__interrupt__, auto_psv)) _U1RXInterrupt(void)             
@@ -80,15 +80,17 @@ void __attribute__((__interrupt__, auto_psv)) _U2RXInterrupt(void)
     }
     return;
  }
+
 void __attribute__((__interrupt__, auto_psv)) _DefaultInterrupt(void)
 {
     if(IFS0bits.AD1IF)
     {
+        /*
         IFS0bits.AD1IF = 0;
         stickADC = ADC1BUF0;
         tipADC = ADC1BUF1;
         clawADC = ADC1BUF2;
-     
+     */
        return;
     }
     else
@@ -104,7 +106,9 @@ void main(void) {
         rxval[i] = 0;       //Initialize the receive array to all 0's
     }
     init();     //Setup clock, UART, and PWMs
-    
+    initAdc1();
+    initTmr3();
+    initDma0();
     //DMA0STAL = __builtin_dmaoffset(stickBuffer); //DMA0 start address low byte 
     xTaskCreate( stickThread, "Stick", 512, NULL, 1, NULL );    //Thread that controls the stick
 	xTaskCreate( tipThread, "Tip", 512, NULL, 1, NULL );      //Thread that controls the tip motion

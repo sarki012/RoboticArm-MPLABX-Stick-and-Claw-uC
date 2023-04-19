@@ -96,7 +96,7 @@ void init(void)
     U1STAbits.ADDEN = 0;        //Address detect mode disabled
     U1STAbits.PERR = 0;         //Parity Error
     U1STAbits.OERR = 0;         //Clear the Receive //Overflow Flag.
-    U1BRG = 7;                 //BAUD RATE 9,600 Fosc = 7.37 Mhz, Fp = Fosc/2
+    U1BRG = 7;                 //BAUD RATE 115,200 Fosc = 7.37 Mhz, Fp = Fosc/2
     IEC0bits.U1TXIE = 0;        //No transmit interrupt (We poll TRMT)
     U1MODEbits.UARTEN = 1;      //UART1 is enabled
     U1STAbits.UTXEN = 1;        //Transmit enabled

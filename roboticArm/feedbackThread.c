@@ -13,22 +13,14 @@
 
 volatile extern char usbRxval[20];     //The UART receive array which holds the data sent 
                                     //via Bluetooth from the tablet
-volatile extern unsigned int stickADC;
-volatile extern unsigned int tipADC;
-volatile extern unsigned int clawADC;
+//volatile extern unsigned int BufferA[MAX_CHNUM][SAMP_BUFF_SIZE];
+volatile extern __eds__ unsigned int BufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
 
 void feedbackThread( void *pvParameters )
 {
     while(1)
     {
         sendChar('s');
-        sendChar((stickADC >> 8) & 0x00FF);
-        sendChar(stickADC & 0x00FF);
-        sendChar('t');
-        sendChar((tipADC >> 8) & 0x00FF);
-        sendChar(tipADC & 0x00FF);
-        sendChar('c');
-        sendChar((clawADC >> 8) & 0x00FF);
-        sendChar(clawADC & 0x00FF);
+        intToChar(BufferA[0][0]);
     }
 }

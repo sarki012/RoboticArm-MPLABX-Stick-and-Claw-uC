@@ -24,8 +24,8 @@
 
 //Create DMA buffer for ADC, the macro is required because the buffer is
 //outside of the normal memory space
-__eds__ unsigned int BufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
-__eds__ unsigned int BufferB[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
+__eds__ unsigned int bufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
+//__eds__ unsigned int bufferB[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
 
 void ProcessADCSamples(int * AdcBuffer);
 
@@ -98,7 +98,8 @@ void initTmr3(void)
 void initDma0(void)
 {
 	DMA0CONbits.AMODE = 2;			// Configure DMA for Peripheral indirect mode
-	DMA0CONbits.MODE  = 2;			// Configure DMA for Continuous Ping-Pong mode
+	//DMA0CONbits.MODE  = 2;			// Configure DMA for Continuous Ping-Pong mode
+    DMA0CONbits.MODE  = 0;			// Configure DMA for Continuous mode, Ping-Pong mode disabled
  //   DMA0CONbits.DIR = 0;        // Reads from peripheral address, writes to RAM address
 	DMA0PAD=(int)&ADC1BUF0;
 	DMA0CNT = (SAMP_BUFF_SIZE*NUM_CHS2SCAN)-1;					
@@ -110,9 +111,9 @@ void initDma0(void)
     //DMA0STBL = 0x0000;
     
     DMA0STAH = 0x0000;
-    DMA0STAL = __builtin_dmaoffset(BufferA);		
-	DMA0STBH = 0x0000;
-    DMA0STBL = __builtin_dmaoffset(BufferB);
+    DMA0STAL = __builtin_dmaoffset(bufferA);		
+	//DMA0STBH = 0x0000;
+    //DMA0STBL = __builtin_dmaoffset(BufferB);
     
     //DMA0STB = __builtin_dmaoffset(BufferB);     //along with a DMA0STBH and DMA0STBL
 

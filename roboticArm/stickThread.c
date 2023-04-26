@@ -20,7 +20,7 @@ void stickThread( void *pvParameters )
     int numDelayLoops = 500;
  
     PHASE1 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
-    PDC1 = 3400;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
+    PDC1 = 3200;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
     while(1)
     {
         for(i = 0; i < 20; i++)

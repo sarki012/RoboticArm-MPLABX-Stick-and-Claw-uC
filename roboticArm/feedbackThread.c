@@ -11,12 +11,11 @@
 #include "FreeRTOSConfig.h"
 #include "main.h"
 
-#define bufferSize 50
+#define bufferSize 10
 volatile extern char usbRxval[20];     //The UART receive array which holds the data sent 
-                                    //via Bluetooth from the tablet
-//volatile extern unsigned int BufferA[MAX_CHNUM][SAMP_BUFF_SIZE];
+
+//The DMA puts the ADC value in bufferA, a two-dimensional array
 volatile extern __eds__ unsigned int bufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
-//volatile extern __eds__ unsigned int bufferB[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
 
 void feedbackThread( void *pvParameters )
 {
@@ -25,36 +24,34 @@ void feedbackThread( void *pvParameters )
     double stickAvg = 0, tipAvg = 0, clawAvg = 0;
     while(1)
     {
-        //sendChar('s');
-        //intToChar(bufferA[0][i]);
-        stickAvgBuffer += bufferA[0][0];
-        tipAvgBuffer += bufferA[1][0];
-        clawAvgBuffer += bufferA[2][0];
+        stickAvgBuffer += bufferA[0][i];    //Two dimensional array: Row [0] is the stick ADC
+        tipAvgBuffer += bufferA[1][i];      //Two dimensional array: Row [1] is the tip ADC
+        clawAvgBuffer += bufferA[2][i];     //Two dimensional array: Row [2] is the claw ADC
         
+        count++;
+        //Only going to send the average every bufferSize loops of the thread
         if(count == bufferSize)
         {
-            stickAvg = stickAvgBuffer/bufferSize;
-            sendChar('s');
-            intToChar((int)stickAvg);
+            stickAvg = stickAvgBuffer/bufferSize;       //Average
+            sendChar('s');      //Send 's' for stick
+            intToChar((int)stickAvg);       //intToChar converts the integer to four characters and sends them out on UART1
             stickAvgBuffer = 0;
-            delay(100);
+            //delay(100);
             tipAvg = tipAvgBuffer/bufferSize;
-            sendChar('t');
+            sendChar('t');                  //'t' for tip
             intToChar((int)tipAvg);
             tipAvgBuffer = 0;
-            delay(100);
+          //  delay(100);
             clawAvg = clawAvgBuffer/bufferSize;
-            sendChar('c');
+            sendChar('c');                  //'c' for claw
             intToChar((int)clawAvg);
             clawAvgBuffer = 0;
-            delay(100);
+        //    delay(100);
             count = 0;
         }
-        count++;
-       // sendChar('c');
-        //intToChar(bufferA[2][i]);
-        i+=2;       //Increment by 2 because data is in words
-        if(i > 8)
+        
+        i++;       //Increment by 2 because data is in words
+        if(i >= 8)
         {
             i = 0;
         }

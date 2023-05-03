@@ -17,7 +17,7 @@ volatile extern char usbRxval[20];     //The UART receive array which holds the 
 void stickThread( void *pvParameters )
 {
     int  i = 0;
-    int numDelayLoops = 500;
+    int numDelayLoops = 200;
  
     PHASE1 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
     PDC1 = 3200;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870

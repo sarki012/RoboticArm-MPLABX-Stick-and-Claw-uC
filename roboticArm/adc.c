@@ -18,6 +18,8 @@
 //Create DMA buffer for ADC, the macro is required because the buffer is
 //outside of the normal memory space
 __eds__ unsigned int bufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));
+//int i = 0, dmaDone = 0, count = 0;
+//unsigned long int stickAvgBuffer = 0, tipAvgBuffer = 0, clawAvgBuffer = 0;
 
 /*=============================================================================
 ADC Initialisation for Channel Scan 
@@ -111,5 +113,16 @@ _DMA0Interrupt(): ISR name is chosen from the device linker script.
 
 void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void)
 {	
+ //   stickAvgBuffer += bufferA[0][0];    //Two dimensional array: Row [0] is the stick ADC
+   // tipAvgBuffer += bufferA[1][0];      //Two dimensional array: Row [1] is the tip ADC
+    //clawAvgBuffer += bufferA[2][0];     //Two dimensional array: Row [2] is the claw ADC
+  //  dmaDone = 1;
+    //count++;
+ //   i += 2;       //Increment by 2 because data is in words
+   // if(i >= 8)
+   // {
+     //   dmaDone = 1;
+       // i = 0;
+   // }
 	IFS0bits.DMA0IF = 0;		// Clear the DMA0 Interrupt Flag
 }

@@ -199,9 +199,20 @@ void init(void)
     FCLCON2bits.FLTMOD = 3;
     PTCONbits.PTEN = 1;         //PWM Module is enabled
     
-
-     
-
-    
+    //Timer 1 500 ms timer for incrementing or decrementing x
+    T2CONbits.TON = 0;          //Stops 16-bit timer 2
+    T2CONbits.TSIDL = 0;        //Continue operation in idle mode
+    T2CONbits.TCKPS = 0;        //1:1 prescalar
+    T2CONbits.TCS = 0;          //Internal clock
+    T2CONbits.TGATE = 0;        //Disable gated timer mode operation
+    T2CONbits.T32 = 0;      //16-bit
+    TMR2 = 0x00; 			//Clear contents of the timer register
+    PR2 = 3684;	//Load the Period register with 1mSec counter 
+	IPC1bits.T2IP = 0x01; 	//Setup Timer2 interrupt for desired priority level
+	// (This example assigns level 1 priority)
+	IFS0bits.T2IF = 0; 		//Clear the Timer2 interrupt status flag
+	IEC0bits.T2IE = 1; 		//Enable Timer2 interrupts
+	T2CONbits.TON = 1; 		//Start Timer2 with prescaler settings at 1:1 and
+							//clock source set to the internal instruction cycle
     return;
 }

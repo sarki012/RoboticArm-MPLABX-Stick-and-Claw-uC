@@ -16,7 +16,7 @@ volatile extern char usbRxval[20];     //The UART receive array which holds the 
 
 //The DMA puts the ADC value in bufferA, a two-dimensional array
 volatile extern __eds__ unsigned int bufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attribute__((eds,aligned(128)));   
-volatile extern double stickAvg, tipAvg, clawAvg;
+volatile extern double stick, tip, claw;
 
 void feedbackThread( void *pvParameters )
 {
@@ -32,17 +32,17 @@ void feedbackThread( void *pvParameters )
         //Only going to send the average every bufferSize loops of the thread
         if(count == bufferSize)
         {
-            stickAvg = stickAvgBuffer/bufferSize;       //Average
+            stick = stickAvgBuffer/bufferSize;       //Average
             sendCharUart1('s');      //Send 's' for stick
-            intToCharUart2((int)stickAvg);       //intToChar converts the integer to four characters and sends them out on UART1
+            intToCharUart1((int)stick);       //intToChar converts the integer to four characters and sends them out on UART1
             stickAvgBuffer = 0;
-            tipAvg = tipAvgBuffer/bufferSize;
+            tip = tipAvgBuffer/bufferSize;
             sendCharUart1('t');                  //'t' for tip
-            intToCharUart2((int)tipAvg);
+            intToCharUart1((int)tip);
             tipAvgBuffer = 0;
-            clawAvg = clawAvgBuffer/bufferSize;
+            claw = clawAvgBuffer/bufferSize;
             sendCharUart1('c');                  //'c' for claw
-            intToCharUart2((int)clawAvg);
+            intToCharUart1((int)claw);
             clawAvgBuffer = 0;
             count = 0;
         }

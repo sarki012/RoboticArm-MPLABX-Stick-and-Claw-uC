@@ -41,6 +41,7 @@
 #include <p33ep512mc502.h>
 /* Standard includes. */
 #include <stdio.h>
+
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -53,18 +54,18 @@
 volatile char usbRxval[20];     //The UART receive array which holds the data sent 
                                 //via USB from the Raspberry Pi
 volatile char rxval[20];    
-int x = 0, y = 0;
-volatile double stickAvg = 0, tipAvg = 0, clawAvg = 0;
-
+int x = 0, y = 0, z = 0;
+volatile double stick = 0, tip = 0, claw = 0;
+volatile unsigned long timerCount = 0;
 //Raspberry Pi USB to UART1 receive interrupt
 void __attribute__((__interrupt__, auto_psv)) _U1RXInterrupt(void)             
 {
     IFS0bits.U1RXIF = 0;        //Clear the interrupt flag
-    usbRxval[x] = U1RXREG;         //Add the value in the receive register to the receive array
-    x++;
-    if(x == 20)
+    usbRxval[z] = U1RXREG;         //Add the value in the receive register to the receive array
+    z++;
+    if(z == 20)
     {  
-        x = 0;
+        z = 0;
     }
     return;
  }
@@ -81,6 +82,21 @@ void __attribute__((__interrupt__, auto_psv)) _U2RXInterrupt(void)
     }
     return;
  }
+
+void __attribute__((__interrupt__, __auto_psv__)) _T2Interrupt(void)
+{
+    if(IFS0bits.T2IF == 1)							// Timer0 causes interrupt.....?
+    {
+	   IFS0bits.T2IF = 0; 							//Reset Timer1 interrupt flag
+       timerCount++;
+       if(timerCount == 1000)       //One second
+       {
+           timerCount = 0;
+           return; 
+       }
+    } 
+    return;
+}
 
 void __attribute__((__interrupt__, auto_psv)) _DefaultInterrupt(void)
 {

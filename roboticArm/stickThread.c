@@ -28,6 +28,45 @@ volatile extern __eds__ unsigned int bufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attrib
 
 void stickThread( void *pvParameters )
 {
+    int  i = 0, boom = 0;
+    int numDelayLoops = 1000;
+    PHASE1 = 62500;
+    PDC1 = 12000;
+   // PHASE1 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
+    //PDC1 = 3200;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
+    while(1)
+    {
+        for(i = 0; i < 20; i++)
+        {
+            if(usbRxval[i] == '&')
+            {
+                break;
+            }
+            else if(usbRxval[i] == 'O')
+            {
+                PDC1--;         //Decrementing the duty cycle moves the stick out
+                delay(numDelayLoops);
+                if(PDC1 < 6777)
+                {
+                    PDC1 = 6777;        //We don't let PDC2 get less than 1658
+                }
+            }
+            else if(usbRxval[i] == 'I')
+            {
+                PDC1++;         //Incrementing the duty cycle moves the stick in
+                delay(numDelayLoops);
+                if(PDC1 > 15813)
+                {
+                    PDC1 = 15813;        //We don't let PDC2 get greater than 3870
+                } 
+            }        
+        }
+    }
+}
+
+/*
+void stickThread( void *pvParameters )
+{
     int  i = 0, j = 0, boom = 0, count = 0;
     unsigned int stick = 0;
     int numDelayLoops = 1000;        //was 750 200
@@ -114,27 +153,27 @@ void stickThread( void *pvParameters )
                 timerCount = 0;
                 while(timerCount < 500);
                 timerCount = 0;
-                /*
-                if(count == 100)
-                {
-                    x += .1;
-                    if(x > 12)
-                    {
-                        x = 12;
-                    }
-                    count = 0;
-                }
-                 */ 
+                
+              //  if(count == 100)
+                //{
+                  //  x += .1;
+                    //if(x > 12)
+                    //{
+                      //  x = 12;
+                    //}
+                    //count = 0;
+                //}
+                  
                // count++;
               //  if()
-                /*
-                PDC1--;         //Decrementing the duty cycle moves the stick out
-                delay(numDelayLoops);
-                if(PDC1 < 1700)
-                {
-                    PDC1 = 1700;        //We don't let PDC2 get less than 1658
-                }
-                 */ 
+               
+               // PDC1--;         //Decrementing the duty cycle moves the stick out
+                //delay(numDelayLoops);
+                //if(PDC1 < 1700)
+                //{
+                  //  PDC1 = 1700;        //We don't let PDC2 get less than 1658
+                //}
+                  
             }
             else if(usbRxval[i] == 'I')
             {
@@ -184,33 +223,32 @@ void stickThread( void *pvParameters )
                 timerCount = 0;
                 while(timerCount < 500);        //100 ms
                 timerCount = 0;
-                /*
-                if(count == 100)
-                {
-                    x -= .1;
-                    if(x < 6)
-                    {
-                        x = 6;
-                    }
-                    count = 0;
-                }
-                count++;
-                 * */
-                /*
-                if(betaFB == beta)
-                {
-                    break;
-                }
-                 * */
-                /*
-                PDC1++;         //Incrementing the duty cycle moves the stick in
-                delay(numDelayLoops);
-                if(PDC1 > 3500)
-                {
-                    PDC1 = 3500;        //We don't let PDC2 get greater than 3870
-                } 
-                 */ 
+                
+              //  if(count == 100)
+                //{
+                  //  x -= .1;
+                    //if(x < 6)
+              //      {
+                //        x = 6;
+                  //  }
+                    //count = 0;
+            //    }
+              //  count++;
+                
+               // if(betaFB == beta)
+                //{
+                  //  break;
+               // }
+                 
+                //PDC1++;         //Incrementing the duty cycle moves the stick in
+               // delay(numDelayLoops);
+                //if(PDC1 > 3500)
+                //{
+                  //  PDC1 = 3500;        //We don't let PDC2 get greater than 3870
+               // } 
+                  
             }        
         }
     }
 }
+ * */

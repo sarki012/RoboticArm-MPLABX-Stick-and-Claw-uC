@@ -26,7 +26,7 @@
 #pragma config POSCMD = NONE            // Primary Oscillator Mode Select bits (Primary Oscillator disabled)
 #pragma config OSCIOFNC = ON            // OSC2 Pin Function bit (OSC2 is general purpose digital I/O pin)
 #pragma config IOL1WAY = OFF            // Peripheral pin select configuration (Allow multiple reconfigurations)
-#pragma config FCKSM = CSECME           // Clock Switching Mode bits (Both Clock switching and Fail-safe Clock Monitor are enabled)
+#pragma config FCKSM = CSECMD           // Clock Switching Mode bits (Both Clock switching and Fail-safe Clock Monitor are disabled)
 
 // FOSCSEL
 #pragma config FNOSC = FRC              // Oscillator Source Selection (Internal Fast RC (FRC))
@@ -124,8 +124,8 @@ void main(void) {
     xTaskCreate( stickThread, "Stick", 512, NULL, 1, NULL );    //Thread that controls the stick
 	xTaskCreate( tipThread, "Tip", 512, NULL, 1, NULL );      //Thread that controls the tip motion
     xTaskCreate( clawThread, "Claw", 512, NULL, 1, NULL );      //Thread that controls the tip motion
-  //  xTaskCreate( feedbackThread, "Feedback", 512, NULL, 1, NULL );      //Thread that sends the feedback values
-    xTaskCreate( stickXDirThread, "Horizontal", 512, NULL, 1, NULL );        //Thread that controls horizontal kinematics
+    xTaskCreate( feedbackThread, "Feedback", 512, NULL, 1, NULL );      //Thread that sends the feedback values
+  //  xTaskCreate( stickXDirThread, "Horizontal", 512, NULL, 1, NULL );        //Thread that controls horizontal kinematics
 	//Start the scheduler
 	vTaskStartScheduler();
 

@@ -30,10 +30,10 @@ void stickThread( void *pvParameters )
 {
     int  i = 0, boom = 0;
     int numDelayLoops = 1000;
-    PHASE1 = 62500;
-    PDC1 = 12000;
-   // PHASE1 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
-    //PDC1 = 3200;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
+    //PHASE1 = 62500;
+    //PDC1 = 14000;
+    PHASE1 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
+    PDC1 = 3300;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
     while(1)
     {
         for(i = 0; i < 20; i++)
@@ -46,18 +46,18 @@ void stickThread( void *pvParameters )
             {
                 PDC1--;         //Decrementing the duty cycle moves the stick out
                 delay(numDelayLoops);
-                if(PDC1 < 6777)
+                if(PDC1 < 1658)
                 {
-                    PDC1 = 6777;        //We don't let PDC2 get less than 1658
+                    PDC1 = 1658;        //We don't let PDC2 get less than 1658
                 }
             }
             else if(usbRxval[i] == 'I')
             {
                 PDC1++;         //Incrementing the duty cycle moves the stick in
                 delay(numDelayLoops);
-                if(PDC1 > 15813)
+                if(PDC1 > 3870)
                 {
-                    PDC1 = 15813;        //We don't let PDC2 get greater than 3870
+                    PDC1 = 3870;        //We don't let PDC2 get greater than 3870
                 } 
             }        
         }

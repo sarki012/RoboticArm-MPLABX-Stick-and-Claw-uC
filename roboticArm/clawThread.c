@@ -1,5 +1,4 @@
 /*
-/*
  * File:   clawThread.c
  * Author: Erik Sarkinen
  *
@@ -17,8 +16,9 @@ volatile extern char usbRxval[20];     //The UART receive array which holds the 
 void clawThread( void *pvParameters )
 {
     int  i = 0;
-    int numDelayLoops = 500;
- 
+    int numDelayLoops = 1000;
+ //   PHASE3 = 62500;
+   // PDC3 = 10000;
     PHASE3 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
     PDC3 = 2500;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
     while(1)

@@ -32,7 +32,7 @@ void feedbackThread( void *pvParameters )
         //Only going to send the average every bufferSize loops of the thread
         if(count == bufferSize)
         {
-            stick = stickAvgBuffer/bufferSize;       //Average
+            stick = ((stickAvgBuffer/bufferSize)/3) - 63;       //Average
             sendCharUart1('s');      //Send 's' for stick
             intToCharUart1((int)stick);       //intToChar converts the integer to four characters and sends them out on UART1
             stickAvgBuffer = 0;

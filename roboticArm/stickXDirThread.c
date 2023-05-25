@@ -31,10 +31,12 @@ void stickXDirThread( void *pvParameters )
     int  i = 0, j = 0, boom = 0;
     unsigned int stick = 0;
     int numDelayLoops = 1000;       //Was 500 2000 1000 500 2000
-    double x = 6;
+    double x = 4;
     int beta = 0, betaFB = 0;
     PHASE1 = 62500;
-    PDC1 = 12000;
+    PDC1 = 14000;
+    
+
    //PHASE2 = 6142;
    // PDC2 = 3906;
    // PHASE2 = 24567;         //24,567 for a 300 Hz Pulse with divide by 1 prescaler. PHASEx is always 36,850 for a 50Hz pulse
@@ -43,6 +45,8 @@ void stickXDirThread( void *pvParameters )
    
     while(1)
     {
+        sendCharUart1('x');      //Send 'x' for x-direction
+        intToCharUart1((int)(x*10));       //intToChar converts the integer to four characters and sends them out on UART1
         stick = bufferA[0][0];
         sendCharUart2('a');
         intToCharUart2((int)stick);
@@ -116,10 +120,12 @@ void stickXDirThread( void *pvParameters )
                 {
                     x = 12;
                 }
-                timerCount = 0;
-                while(timerCount < 1000);
-                timerCount = 0;
-                break;
+                sendCharUart1('x');      //Send 'B' for betaFB
+                intToCharUart1((int)(x*10));       //intToChar converts the integer to four characters and sends them out on UART1
+             //   timerCount = 0;
+               // while(timerCount < 1000);
+                //timerCount = 0;
+            //    break;
             }
             else if(usbRxval[i] == 'r')         //I for In
             {
@@ -167,14 +173,16 @@ void stickXDirThread( void *pvParameters )
                     }             
                 }
                 x -= .5;    //decrement by .1 every 10 ms
-                if(x < 6)
+                if(x < 4)
                 {
-                    x = 6;
+                    x = 4;
                 }
-                timerCount = 0;
-                while(timerCount < 1000);        //100 ms
-                timerCount = 0;
-                break;
+                sendCharUart1('x');      //Send 'B' for betaFB
+                intToCharUart1((int)(x*10));       //intToChar converts the integer to four characters and sends them out on UART1
+          //      timerCount = 0;
+            //    while(timerCount < 1000);        //100 ms
+              //  timerCount = 0;
+               // break;
             }
         }
     }

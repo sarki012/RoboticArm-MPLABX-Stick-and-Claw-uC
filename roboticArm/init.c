@@ -20,7 +20,7 @@ void init(void)
     OSCCONbits.NOSC2 = 0;       //Fast RC Oscillator
    // OSCCONbits.OSWEN = 1;       //Requests oscillator switch to selection specified by the NOSC[2:0] bits
     OSCTUN = 0;         //Center frequency 7.37 MHz
-    /*
+    
     PLLFBD = 0b0000000000111111;     //PLLDIV, M, PLL Multiplier = 65    
     CLKDIVbits.PLLPRE = 0;      //Divide by 2
     CLKDIVbits.PLLPOST = 0;     // Divide by 2
@@ -35,7 +35,7 @@ void init(void)
     while (OSCCONbits.COSC!= 0b001);
     // Wait for PLL to lock
     while (OSCCONbits.LOCK!= 1);
-   */ 
+    
     RPINR18 = 0b0000000000100110;       //U1RX = RP38
     RPINR19 = 0b0000000000100101;       //U2RX = RP37 
     RPOR3 = 0b0000001100000001;     // U2TX = RP41, U1_TX = RP40
@@ -78,8 +78,8 @@ void init(void)
     U2STAbits.ADDEN = 0;          //Address detect mode disabled
     U2STAbits.PERR = 0;         //Parity Error
     U2STAbits.OERR = 0;           //Clear the Receive //Overflow Flag.
-   // U2BRG = 129;                 //BAUD RATE 115,200 Fosc = 120Mhz Mhz, Fp = Fosc/2
-    U2BRG = 7;                 //BAUD RATE 115,200 Fosc = 7.37 Mhz, Fp = Fosc/2 5 is close
+    U2BRG = 129;                 //BAUD RATE 115,200 Fosc = 120Mhz Mhz, Fp = Fosc/2
+   // U2BRG = 7;                 //BAUD RATE 115,200 Fosc = 7.37 Mhz, Fp = Fosc/2 5 is close
     IEC1bits.U2TXIE = 0;        //No transmit interrupt (We poll TRMT)
     U2MODEbits.UARTEN = 1;      //UART2 is enabled
     U2STAbits.UTXEN = 1;        //Transmit enabled
@@ -110,8 +110,8 @@ void init(void)
     U1STAbits.ADDEN = 0;        //Address detect mode disabled
     U1STAbits.PERR = 0;         //Parity Error
     U1STAbits.OERR = 0;         //Clear the Receive //Overflow Flag.
-   // U1BRG = 129;                 //BAUD RATE 115,200 Fosc = 120Mhz Mhz, Fp = Fosc/2
-    U1BRG = 7;                 //BAUD RATE 115,200 Fosc = 7.37 Mhz, Fp = Fosc/2
+    U1BRG = 129;                 //BAUD RATE 115,200 Fosc = 120Mhz Mhz, Fp = Fosc/2
+   // U1BRG = 7;                 //BAUD RATE 115,200 Fosc = 7.37 Mhz, Fp = Fosc/2
     IEC0bits.U1TXIE = 0;        //No transmit interrupt (We poll TRMT)
     U1MODEbits.UARTEN = 1;      //UART1 is enabled
     U1STAbits.UTXEN = 1;        //Transmit enabled
@@ -137,8 +137,8 @@ void init(void)
     PTCONbits.SYNCSRC0 = 0;     //Synchronous Source is PTGO17
     PTCONbits.SYNCSRC1 = 1;
     PTCONbits.SYNCSRC2 = 0;
-  //  PTCON2bits.PCLKDIV = 4;     //Divide by 16 prescalar
-    PTCON2bits.PCLKDIV = 2;     //Divide by 4 prescalar
+    PTCON2bits.PCLKDIV = 4;     //Divide by 16 prescalar
+  //  PTCON2bits.PCLKDIV = 2;     //Divide by 4 prescalar
    // PTCON2bits.PCLKDIV0 = 0;      //010 divide by 4 prescaler *Adjust this depending on resolution
     //PTCON2bits.PCLKDIV1 = 1;
     //PTCON2bits.PCLKDIV2 = 0;

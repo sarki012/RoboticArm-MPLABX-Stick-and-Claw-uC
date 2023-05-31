@@ -18,10 +18,10 @@ void tipThread( void *pvParameters )
     int  i = 0;
     int numDelayLoops = 1000;
  
- //   PHASE2 = 62500;
-  //  PDC2 = 12000;
-    PHASE2 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
-    PDC2 = 3100;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
+    PHASE2 = 62500;
+    PDC2 = 12000;
+   // PHASE2 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
+    //PDC2 = 3100;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
     while(1)
     {
         for(i = 0; i < 20; i++)
@@ -34,18 +34,18 @@ void tipThread( void *pvParameters )
             {
                 PDC2--;         //Decrementing the duty cycle moves the stick out
                 delay(numDelayLoops);
-                if(PDC2 < 1658)
+                if(PDC2 < 6777)     //Was 1658
                 {
-                    PDC2 = 1658;        //We don't let PDC2 get less than 1658
+                    PDC2 = 6777;        //We don't let PDC2 get less than 1658
                 }
             }
             else if(usbRxval[i] == 'p')
             {
                 PDC2++;         //Incrementing the duty cycle moves the stick in
                 delay(numDelayLoops);
-                if(PDC2 > 3870)
+                if(PDC2 > 15813)
                 {
-                    PDC2 = 3870;        //We don't let PDC2 get greater than 3870
+                    PDC2 = 15813;        //We don't let PDC2 get greater than 3870
                 } 
             }        
         }

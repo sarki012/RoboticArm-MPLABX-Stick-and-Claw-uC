@@ -26,7 +26,7 @@
 #pragma config POSCMD = NONE            // Primary Oscillator Mode Select bits (Primary Oscillator disabled)
 #pragma config OSCIOFNC = ON            // OSC2 Pin Function bit (OSC2 is general purpose digital I/O pin)
 #pragma config IOL1WAY = OFF            // Peripheral pin select configuration (Allow multiple reconfigurations)
-#pragma config FCKSM = CSECMD           // Clock Switching Mode bits (Both Clock switching and Fail-safe Clock Monitor are disabled)
+#pragma config FCKSM = CSECME          // Clock Switching Mode bits (Both Clock switching and Fail-safe Clock Monitor are enabled)
 
 // FOSCSEL
 #pragma config FNOSC = FRC              // Oscillator Source Selection (Internal Fast RC (FRC))
@@ -57,7 +57,7 @@ volatile char rxval[20];
 int y = 0, z = 0;
 volatile double x = 4.5;
 volatile int xDirection = -1;
-volatile double stick = 0, tip = 0, claw = 0;
+volatile double boom = 0, stick = 0, tip = 0;
 volatile unsigned long timerCount = 0;
 volatile int timerDone = 0;
 //Raspberry Pi USB to UART1 receive interrupt
@@ -96,29 +96,7 @@ void __attribute__((__interrupt__, __auto_psv__)) _T2Interrupt(void)
        {
            timerCount = 0;
            timerDone = 1;
-           /*
-           if(xDirection == -1)
-           {
-               return;
-           }
-           else if(xDirection == 1)
-           {
-               x += .5;
-               if(x >= 10)
-               {
-                   x = 10;
-               }
-           }
-            else if(xDirection == 0)
-           {
-               x -= .5;
-               if(x <= 4)
-               {
-                   x = 4;
-               }
-           }
-           return;
-            */ 
+
        }
     } 
     return;
@@ -147,11 +125,11 @@ void main(void) {
     initTmr3();
     initDma0();
     
+    xTaskCreate( boomThread, "Boom", 256, NULL, 1, NULL );      //Thread that controls the boom
     xTaskCreate( stickThread, "Stick", 256, NULL, 1, NULL );    //Thread that controls the stick
 	xTaskCreate( tipThread, "Tip", 256, NULL, 1, NULL );      //Thread that controls the tip motion
-    xTaskCreate( clawThread, "Claw", 256, NULL, 1, NULL );      //Thread that controls the tip motion
     xTaskCreate( feedbackThread, "Feedback", 256, NULL, 1, NULL );      //Thread that sends the feedback values
-    xTaskCreate( stickXDirThread, "Horizontal", 256, NULL, 1, NULL );        //Thread that controls horizontal kinematics
+    xTaskCreate( xKinematicsThread, "xKinematics", 256, NULL, 1, NULL );        //Thread that controls horizontal kinematics
 	//Start the scheduler
 	vTaskStartScheduler();
 

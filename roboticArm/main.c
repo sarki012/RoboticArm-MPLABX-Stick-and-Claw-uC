@@ -49,6 +49,8 @@
 #include "croutine.h"
 #include "FreeRTOSConfig.h"
 #include "main.h"
+#include "timers.h"
+
 
 
 volatile char usbRxval[20];     //The UART receive array which holds the data sent 
@@ -112,8 +114,9 @@ void __attribute__((__interrupt__, auto_psv)) _DefaultInterrupt(void)
          return;
     return;
 }
-
+ 
 void main(void) {
+    long x;
     int i = 0;
     for(i = 0; i < 20; i++)
     {
@@ -128,8 +131,9 @@ void main(void) {
     xTaskCreate( boomThread, "Boom", 256, NULL, 1, NULL );      //Thread that controls the boom
     xTaskCreate( stickThread, "Stick", 256, NULL, 1, NULL );    //Thread that controls the stick
 	xTaskCreate( tipThread, "Tip", 256, NULL, 1, NULL );      //Thread that controls the tip motion
+    xTaskCreate( inOutAutoThread, "In Out", 256, NULL, 1, NULL );      //Thread that controls the tip motion
     xTaskCreate( feedbackThread, "Feedback", 256, NULL, 1, NULL );      //Thread that sends the feedback values
-    xTaskCreate( xKinematicsThread, "xKinematics", 256, NULL, 1, NULL );        //Thread that controls horizontal kinematics
+    //xTaskCreate( xKinematicsThread, "xKinematics", 256, NULL, 1, NULL );        //Thread that controls horizontal kinematics
 	//Start the scheduler
 	vTaskStartScheduler();
 

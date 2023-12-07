@@ -25,9 +25,14 @@ volatile extern __eds__ unsigned int bufferA[SAMP_BUFF_SIZE] __attribute__((eds,
 void boomThread( void *pvParameters )
 {
     int  i = 0, direction = 0, stick = 0;
-    int numDelayLoops = 3000;       //Was 2000
+    int numDelayLoops = 500;       //Was 2000
     PHASE3 = 62500;
     PDC3 = 10000;
+    for(int i = 0; i < 10; i++)
+    {
+        PDC3--;
+        delay(100);
+    }
     //PHASE3 = 36850;         //Fosc = 120 MHz, Prescaler = 8, PHASE2 = 50,000
     //PDC3 = 2500;           //Min PDC2 = 16,636, Max PDC2 = 31,818
    //PHASE2 = 6142;

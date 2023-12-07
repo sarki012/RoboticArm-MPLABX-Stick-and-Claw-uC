@@ -29,10 +29,10 @@ volatile extern __eds__ unsigned int bufferA[MAX_CHNUM][SAMP_BUFF_SIZE] __attrib
 void stickThread( void *pvParameters )
 {
     int  i = 0, boom = 0;
-    int numDelayLoops = 3000;
+    int numDelayLoops = 500;
     
     PHASE1 = 62500;
-    PDC1 = 12000;
+    PDC1 = 14000;
     //PHASE1 = 62500;
     //PDC1 = 14000;
  //   PHASE1 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse

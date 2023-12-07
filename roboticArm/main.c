@@ -132,6 +132,7 @@ void main(void) {
     xTaskCreate( stickThread, "Stick", 256, NULL, 1, NULL );    //Thread that controls the stick
 	xTaskCreate( tipThread, "Tip", 256, NULL, 1, NULL );      //Thread that controls the tip motion
     xTaskCreate( inOutAutoThread, "In Out", 256, NULL, 1, NULL );      //Thread that controls the tip motion
+    xTaskCreate( returnHomeThread, "Return", 256, NULL, 1, NULL );      //Thread that controls the tip motion
     xTaskCreate( feedbackThread, "Feedback", 256, NULL, 1, NULL );      //Thread that sends the feedback values
     //xTaskCreate( xKinematicsThread, "xKinematics", 256, NULL, 1, NULL );        //Thread that controls horizontal kinematics
 	//Start the scheduler

@@ -16,10 +16,10 @@ volatile extern char usbRxval[20];     //The UART receive array which holds the 
 void tipThread( void *pvParameters )
 {
     int  i = 0;
-    int numDelayLoops = 1000;
+    int numDelayLoops = 500;
  
     PHASE2 = 62500;
-    PDC2 = 12000;
+    PDC2 = 15000;
    // PHASE2 = 36850;         //PHASEx is always 36,850 for a 50Hz pulse
     //PDC2 = 3100;            //Duty cycle register. Starting duty cycle is x. Max + PDCx = 1658, max - PDCx = 3870
     while(1)
@@ -32,7 +32,7 @@ void tipThread( void *pvParameters )
             }
             else if(usbRxval[i] == 't')
             {
-                PDC2--;         //Decrementing the duty cycle moves the stick out
+                PDC2--;         //Decrementing the duty cycle tips the claw down
                 delay(numDelayLoops);
                 if(PDC2 < 6777)     //Was 1658
                 {
@@ -41,7 +41,7 @@ void tipThread( void *pvParameters )
             }
             else if(usbRxval[i] == 'p')
             {
-                PDC2++;         //Incrementing the duty cycle moves the stick in
+                PDC2++;         //Incrementing the duty cycle tips the claw up
                 delay(numDelayLoops);
                 if(PDC2 > 15813)
                 {
